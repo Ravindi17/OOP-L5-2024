@@ -1,35 +1,44 @@
 package com.TicketingSystem.systemusers;
 
 import com.TicketingSystem.TicketPool;
+import java.util.logging.Logger;
+
 
 public class Customer implements Runnable {
-    private String customerID;
-    private int customerRetrievalRate;
-    private TicketPool ticketPool;
+    private final String customerID;
+    private final int customerRetrievalRate;
+    private final TicketPool ticketPool;
 
-    public Customer(String customerID , int customerRetrievalRate){
+    public static final  Logger logger = Logger.getLogger(Customer.class.getName());
+
+    public Customer(String customerID , int customerRetrievalRate , TicketPool ticketPool){
         this.customerID = customerID;
         this.customerRetrievalRate = customerRetrievalRate;
         this.ticketPool = ticketPool;
     }
 
-
+    @Override
     public void run(){
         try{
             while(true){
-                Ticket ticket = ticketPool.removeTicket();
+                Integer ticket = null;
+                synchronized (ticketPool){
+                    ticket = ticketPool.removeTicket();
+                    if(ticket == null){
+                        logger.warning("customer has no ticket to purchase");
+                        ticketPool.wait();
+                    }
+                }
                 if(ticket != null){
-                    System.out.println("customer "+ customerID +"purchased ticket: " + ticket);
+                   logger.info("customer "+ customerID +"purchased ticket: " + ticket);
                 }
-                else{
-                    System.out.println("Customer" + customerID+ " has no tickets to purchase");
-                }
-                Thread.sleep(customerRetrievalRate);
-            }
 
+                Thread.sleep(customerRetrievalRate);
+                }
 
         }catch (InterruptedException e){
-            System.out.println("The activities of customer " + customerID + "has stopped");
+            logger.severe("The activities of customer " + customerID + "has stopped");
+            Thread.currentThread().interrupt();
         }
 
 

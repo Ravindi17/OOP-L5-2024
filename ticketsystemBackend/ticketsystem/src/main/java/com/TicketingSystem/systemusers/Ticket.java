@@ -1,31 +1,14 @@
 package com.TicketingSystem.systemusers;
 
 public class Ticket {
-    private String name;
-    private String description;
+    private int ID;
 
-    // Constructors, getters, and setters
-    public Ticket(String name, String description) {
-        this.name = name;
-        this.description = description;
+    public Ticket(int ID) {
+        this.ID = ID;
     }
 
-    public Ticket(int nextTicketID) {
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
+    @Override
+    public String toString() {
+        return "Ticket ID = " + ID ;
     }
 }

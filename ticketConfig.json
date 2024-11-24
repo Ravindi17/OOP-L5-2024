@@ -1,1 +1,1 @@
-{"name":"Concert Ticket","description":"VIP Access for the concert"}
+{"totalTickets":5,"ticketReleaseRate":2,"customerRetrievalRate":2,"maximumTicketCapacity":10}

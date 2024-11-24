@@ -1,49 +1,49 @@
 package com.TicketingSystem;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.TicketingSystem.systemusers.Ticket;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.LinkedList;
 import java.util.Queue;
+import java.util.logging.Logger;
 
 public class TicketPool {
-    private final Queue<Ticket> tickets = new ConcurrentLinkedQueue<>();
-    private final int maximumCapacity;
-    private int nextTicketID = 1;
+    private final Queue<Integer> tickets = new LinkedList<>();
+    private final int maxCapacity;
+    private int ticketID = 0;
 
-    public TicketPool(int maximumCapacity){
-        this.maximumCapacity = maximumCapacity;
+    private static final Logger logger = Logger.getLogger(TicketPool.class.getName());
+
+    public TicketPool(int maxCapacity) {
+        this.maxCapacity = maxCapacity;
     }
 
-    private static final Logger logger = LoggerFactory.getLogger(TicketPool.class);
-
-    public synchronized void addTickets(int numberOfTickets){
-        for (int num = 0; num < numberOfTickets; num++){
-            if(tickets.size() < maximumCapacity){
-                Ticket newTicket = new Ticket(nextTicketID);
-                tickets.add(newTicket);
-                logger.info("The ticket " + newTicket+ "has been added succesfully. The total ticket number is " + tickets.size() );
-                nextTicketID++;
+    public synchronized void addTicket(int numberOfTickets) {
+            for(int num = 0; num < numberOfTickets; num++) {
+                if(tickets.size() < maxCapacity) {
+                    tickets.add(ticketID++);
+                    logger.info("Ticket with ID: "+ ticketID+ " added succesfully: " + "The total number of tickets now : " + tickets.size());
+                }else {
+                    logger.warning("Ticket capacity is reached.");
+                    break;
+                }
             }
-            else{
-                logger.warn("The maximum number of tickets released. Cannot add the ticket");
-                break;
-            }
-        }
-    }
-    public synchronized Ticket removeTicket(){
-        if(!tickets.isEmpty()){
-            Ticket ticket = tickets.poll();
-            logger.info("Ticket" + ticket + "removed succesfully. The number of tickets available are" + tickets.size());
-            return ticket;
-        }else{
-          logger.warn("No tickets available to be removed");
-          return null;
-        }
+           notifyAll();
     }
 
-    public synchronized int getTotalNumTickets(){
-        return  tickets.size();
+    public synchronized Integer removeTicket() {
+        if (tickets.isEmpty()) {
+            logger.warning("No tickets available to remove.");
+            return null; // Explicitly indicate no ticket was removed
+        }
+        Integer ticket = tickets.poll();
+        logger.info("Ticket removed successfully: " + ticket + ". Remaining tickets: " + tickets.size());
+        return ticket;
     }
+
+
+    public synchronized int getCount() {
+        return tickets.size();
+    }
+
+
+
 
 }
