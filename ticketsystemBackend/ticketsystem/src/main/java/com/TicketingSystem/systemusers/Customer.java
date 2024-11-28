@@ -19,28 +19,27 @@ public class Customer implements Runnable {
 
     @Override
     public void run(){
+        Thread.currentThread().setName("Customer ID: " + customerID);
         try{
             while(true){
                 Integer ticket = null;
+
                 synchronized (ticketPool){
-                    ticket = ticketPool.removeTicket();
-                    if(ticket == null){
-                        logger.warning("customer has no ticket to purchase");
+                    while(ticketPool.getCount() == 0){
+                        logger.warning(Thread.currentThread().getName() + " "+ "customer has no ticket to purchase");
                         ticketPool.wait();
                     }
-                }
-                if(ticket != null){
-                   logger.info("customer "+ customerID +"purchased ticket: " + ticket);
+                    ticket = ticketPool.removeTicket();
+                    logger.info(Thread.currentThread().getName() + " "+ "purchased ticket: " + ticket);
+                    ticketPool.notify();
                 }
 
-                Thread.sleep(customerRetrievalRate);
+                    Thread.sleep(customerRetrievalRate);
                 }
 
         }catch (InterruptedException e){
-            logger.severe("The activities of customer " + customerID + "has stopped");
+            logger.severe(Thread.currentThread().getName() + "The activities of customer" + " " + customerID + "has stopped");
             Thread.currentThread().interrupt();
         }
-
-
     }
 }

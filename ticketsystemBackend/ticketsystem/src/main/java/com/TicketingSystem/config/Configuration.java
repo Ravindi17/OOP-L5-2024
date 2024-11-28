@@ -21,8 +21,6 @@ public class Configuration {
 
     public static final String configFilePath = "ticketConfig.json"; // JSON file path
 
-    public Configuration() {
-    }
 
     // Getter and setter methods with validation
     public int getTotalTickets() {
@@ -36,13 +34,13 @@ public class Configuration {
                 int input = scanner.nextInt();
                 if (input > 0) {
                     this.totalTickets = input;
-                    System.out.println("Total Tickets set to:" + totalTickets);
+                    logger.info("Total Tickets set to:" + totalTickets);
                     break;
                 } else {
-                    System.out.println("Enter a positive value. Try again");
+                    logger.warn("Enter a positive value. Try again");
                 }
             } else {
-                System.out.println("Please enter a valid integer");
+                logger.warn("Please enter a valid integer");
                 scanner.next(); // Clear invalid input
             }
         }
@@ -61,10 +59,10 @@ public class Configuration {
                     ticketReleaseRate = input;
                     break;
                 } else {
-                    System.out.println("Enter a positive value. Try again");
+                    logger.warn("Enter a positive value. Try again");
                 }
             } else {
-                System.out.println("Please enter a valid integer");
+                logger.warn("Please enter a valid integer");
                 scanner.next(); // Clear invalid input
             }
         }
@@ -122,16 +120,21 @@ public class Configuration {
         try {
             // Write the configuration object to the JSON file
             objectMapper.writeValue(configFile, config);
-            System.out.println("Configuration saved successfully to " + configFilePath);
+           logger.info("Configuration saved successfully to " + configFilePath);
         } catch (IOException e) {
-            System.out.println("Error saving configuration to file: " + e.getMessage());
+            logger.warn("Error saving configuration to file: " + e.getMessage());
         }
     }
 
     public static Configuration loadConfiguration(String configFilePath) {
         ObjectMapper objectMapper = new ObjectMapper();
         try{
-            return objectMapper.readValue(new File(configFilePath) , Configuration.class);
+            File configFile = new File(configFilePath);
+            if(!configFile.exists()){
+                logger.info("Configuration file does not exist");
+                return new Configuration();
+            }
+            return objectMapper.readValue(configFile, Configuration.class);
         }catch (IOException e){
             logger.error("Failed to load configuration: " + e.getMessage());
             return null;
