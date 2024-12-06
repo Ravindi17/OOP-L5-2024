@@ -3,43 +3,41 @@ package com.TicketingSystem.systemusers;
 import com.TicketingSystem.TicketPool;
 import java.util.logging.Logger;
 
-
 public class Customer implements Runnable {
-    private final String customerID;
-    private final int customerRetrievalRate;
-    private final TicketPool ticketPool;
+    private String customerId;
+    private int customerRetrievalRate;
+    private TicketPool ticketPool;
+    private volatile boolean running = true;
 
-    public static final  Logger logger = Logger.getLogger(Customer.class.getName());
+    private static final Logger logger = Logger.getLogger(Customer.class.getName());
 
-    public Customer(String customerID , int customerRetrievalRate , TicketPool ticketPool){
-        this.customerID = customerID;
+    public Customer(String customerId, int customerRetrievalRate, TicketPool ticketPool) {
+        this.customerId = customerId;
         this.customerRetrievalRate = customerRetrievalRate;
         this.ticketPool = ticketPool;
     }
 
     @Override
-    public void run(){
-        Thread.currentThread().setName("Customer ID: " + customerID);
-        try{
-            while(true){
-                Integer ticket = null;
+    public void run() {
+        while (running) {
+            try {
+                // Simulate customer retrieval rate
+                Thread.sleep(customerRetrievalRate);
 
-                synchronized (ticketPool){
-                    while(ticketPool.getCount() == 0){
-                        logger.warning(Thread.currentThread().getName() + " "+ "customer has no ticket to purchase");
-                        ticketPool.wait();
-                    }
-                    ticket = ticketPool.removeTicket();
-                    logger.info(Thread.currentThread().getName() + " "+ "purchased ticket: " + ticket);
-                    ticketPool.notify();
+                // Retrieve a ticket from the pool
+                Integer ticket = ticketPool.removeTicket();
+                if (ticket != null) {
+                    logger.info("Customer " + customerId + " retrieved ticket with ID: " + ticket);
                 }
-
-                    Thread.sleep(customerRetrievalRate);
-                }
-
-        }catch (InterruptedException e){
-            logger.severe(Thread.currentThread().getName() + "The activities of customer" + " " + customerID + "has stopped");
-            Thread.currentThread().interrupt();
+            } catch (InterruptedException e) {
+                // Handle interruption
+                logger.warning("Customer " + customerId + " thread interrupted.");
+                break;
+            }
         }
+    }
+
+    public void stopRunning() {
+        running = false;
     }
 }

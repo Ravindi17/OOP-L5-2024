@@ -4,45 +4,42 @@ import com.TicketingSystem.TicketPool;
 import java.util.logging.Logger;
 
 public class Vendor implements Runnable {
-    private final TicketPool ticketpool;
-    private final String vendorID;
-    private final int ticketsPerRelease;
-    private final int ticketsReleaseInterval;
+    private final String vendorId;
+    private final int ticketReleaseRate;
+    private final TicketPool ticketPool;
+    private volatile boolean running = true;
 
-    private static final Logger log = Logger.getLogger(Vendor.class.getName());
+    private static final Logger logger = Logger.getLogger(Vendor.class.getName());
 
-    public Vendor(String vendorID, int ticketsPerRelease, int ticketsReleaseInterval, TicketPool ticketpool) {
-        this.vendorID = vendorID;
-        this.ticketsReleaseInterval = ticketsReleaseInterval;
-        this.ticketsPerRelease = ticketsPerRelease;
-        this.ticketpool = ticketpool;
+    public Vendor(String vendorId, int ticketReleaseRate, TicketPool ticketPool) {
+        this.vendorId = vendorId;
+        this.ticketReleaseRate = ticketReleaseRate;
+        this.ticketPool = ticketPool;
     }
+
 
     @Override
     public void run() {
-        Thread.currentThread().setName("Vendor ID: " + vendorID);
-        try {
-            while (true) {
-                synchronized (ticketpool) {
-                    int addedTicketsNum = 0;
+        while (running) {
+            try {
+                // Simulate ticket release rate
+                Thread.sleep(ticketReleaseRate);
 
-                    for (int num = 0; num < ticketsPerRelease; num++) {
-                        int ticketID = ticketpool.getCount() + 1;
-                        if(ticketpool.addTicket()){
-                            addedTicketsNum++;
-                        }else{
-                            log.warning(Thread.currentThread().getName() + " " + "Unsuccessful in adding ticket with ID " + ticketID);
-                            break;
-                        }
-                    }
-                    log.info(Thread.currentThread().getName() + " " +  "Added" + " " +  addedTicketsNum + " " + "tickets");
-                    ticketpool.notifyAll();
+                // Add a ticket to the pool
+                boolean added = ticketPool.addTicket();
+
+                if (added) {
+                    logger.info("Ticket with ID: " + ticketPool.getTicketIDNumber()+ "added by : " + vendorId );
                 }
-                Thread.sleep(ticketsReleaseInterval);
+            } catch (InterruptedException e) {
+                // Handle interruption
+                logger.warning("Vendor " + vendorId + " thread interrupted.");
+                break;
             }
-        }catch(InterruptedException e){
-            log.severe(Thread.currentThread().getName()+ " " + "Thread interrupted");
-            Thread.currentThread().interrupt();
         }
+    }
+
+    public void stopRunning() {
+        running = false;
     }
 }
