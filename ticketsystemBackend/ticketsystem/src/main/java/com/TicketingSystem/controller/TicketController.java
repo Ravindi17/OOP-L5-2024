@@ -1,4 +1,4 @@
-package com.TicketingSystem.controller;
+package com.TicketingSystem.controller;/*package com.TicketingSystem.controller;
 
 import com.TicketingSystem.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +11,7 @@ public class TicketController {
 
     private final TicketService ticketService;
 
-    @Autowired
+
     public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
@@ -39,5 +39,44 @@ public class TicketController {
     @GetMapping("/status")
     public ResponseEntity<String> getTicketPoolStatus() {
         return ResponseEntity.ok(ticketService.getTicketPoolStatus()); // Call TicketService's getTicketPoolStatus method
+    }
+}
+*/
+
+
+import com.TicketingSystem.service.TicketService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/api/tickets")
+public class TicketController {
+
+    private final TicketService ticketService;
+
+    public TicketController(TicketService ticketService) {
+        this.ticketService = ticketService;
+    }
+
+    @PostMapping("/start")
+    public ResponseEntity<String> startTicketSystem() {
+        ticketService.startSystem();
+        return ResponseEntity.ok("Ticket system started.");
+    }
+
+    @PostMapping("/stop")
+    public ResponseEntity<String> stopTicketSystem() {
+        ticketService.stopSystem();
+        return ResponseEntity.ok("Ticket system stopped.");
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<Map<String, Integer>> getSummary() {
+        return ResponseEntity.ok(ticketService.getSummary());
     }
 }

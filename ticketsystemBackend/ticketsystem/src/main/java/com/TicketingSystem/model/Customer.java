@@ -1,9 +1,6 @@
 package com.TicketingSystem.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.slf4j.Logger;
@@ -20,21 +17,29 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+
+
     private String name;
     private int retrievalRate;
+
+    @Transient
+    private TicketPool ticketPool;
 
     public Customer(String name, int retrievalRate , TicketPool ticketPool) {
         this.name = name;
         this.retrievalRate = retrievalRate;
+        this.ticketPool = ticketPool;
     }
 
     public Customer() {
     }
 
     public void consumeTickets(TicketPool ticketPool) throws InterruptedException {
-        while (true) {
+        int maxvalue = 0;
+        while (maxvalue < 10) {
             int ticketId = ticketPool.removeTicket();
             log.info(" {} retrieved ticket ID: {} " , name ,ticketId);
+            maxvalue++;
             Thread.sleep(retrievalRate);
         }
     }

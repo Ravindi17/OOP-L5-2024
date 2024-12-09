@@ -7,11 +7,13 @@ import jakarta.persistence.Id;
 import lombok.Getter;
 import lombok.Setter;
 
+
 @Entity
 public class Configuration {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+
     private Long id;
 
     // Getters and setters

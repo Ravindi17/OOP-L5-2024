@@ -1,13 +1,25 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import {ConfigurationFormComponent} from './configuration-form/configuration-form.component';
+import {ControlPanelComponent} from './control-panel/control-panel.component';
+import {ActivityDisplayComponent} from './activity-display/activity-display.component';
+import {SummaryDisplayComponent} from './summary-display/summary-display.component';
+import {RouterLink, RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-root',
-  standalone: true,
-  imports: [RouterOutlet],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  standalone: true,
+  imports: [
+    ConfigurationFormComponent,
+    ControlPanelComponent,
+    ActivityDisplayComponent,
+    SummaryDisplayComponent,
+    RouterOutlet,
+    RouterLink
+  ],
+  styleUrls: ['./app.component.css']
 })
 export class AppComponent {
   title = 'ticketsystemAngular';
 }
+
